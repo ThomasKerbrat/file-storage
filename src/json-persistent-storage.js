@@ -45,31 +45,46 @@
             try {
                 value = JSON.stringify(value);
             } catch (err) {
-                cb(err);
+                err.n = 0;
+                return cb(err);
             }
 
             fs.access(_path, function (err) {
                 if (err !== null) {
                     if (err.code === 'ENOENT') {
-                        mkdirp(_path);
+                        mkdirp(_path, function (err) {
+                            if (err) {
+                                err.n = 3;
+                                cb(err);
+                            } else {
+                                resume();
+                            }
+                        });
                     } else {
+                        err.n = 1;
                         cb(err);
                     }
+                } else {
+                    resume();
                 }
+            });
 
+            function resume() {
                 var filePath = path.format({ dir: _path, name: key, ext: '.json' });
                 fs.writeFile(filePath, value, function (err) {
                     if (err) {
-                        cb(err);
-                    } else {
-                        if (keys.indexOf(key) === -1) {
-                            keys.push(key);
-                            length++;
-                        }
-                        cb(null);
+                        err.n = 2;
+                        return cb(err);
                     }
+
+                    if (keys.indexOf(key) === -1) {
+                        keys.push(key);
+                        length++;
+                    }
+
+                    cb(null);
                 });
-            });
+            }
         }
 
         function removeItem(key) { }

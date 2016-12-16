@@ -4,6 +4,7 @@ const Storage = require('../src/json-persistent-storage.js').JsonPersistentStora
 const fs = require('fs');
 const path = require('path');
 const rimraf = require('rimraf');
+const mkdirp = require('mkdirp');
 
 const cl = console.log;
 function log(value) { console.log('**LOG**', value); return value; };
@@ -12,21 +13,31 @@ describe('JsonPersistentStorage', function () {
     let storage;
     const myPath = 'test/data/myPath';
 
-    it('should throw an error when no params are given', function () {
-        assert.throws(function () {
-            storage = new Storage();
-        }, TypeError, /Missing path argument/);
+    beforeEach(function () {
+        rimraf.sync(path.join(path.dirname(myPath), '**/*'));
     });
 
-    it('should not throw an error when a param is given', function () {
-        assert.doesNotThrow(function () {
+    after(function () {
+        rimraf.sync(path.join(path.dirname(myPath), '**/*'));
+    });
+
+    describe('constructor', function () {
+        it('should throw an error when no params are given', function () {
+            assert.throws(function () {
+                storage = new Storage();
+            }, TypeError, /Missing path argument/);
+        });
+
+        it('should not throw an error when a param is given', function () {
+            assert.doesNotThrow(function () {
+                storage = new Storage(myPath);
+            }, TypeError, /Missing path argument/);
+        });
+
+        it('should instantiate a new JsonPersistentStorage object', function () {
             storage = new Storage(myPath);
-        }, TypeError, /Missing path argument/);
-    });
-
-    it('should instantiate a new JsonPersistentStorage object', function () {
-        storage = new Storage(myPath);
-        assert.instanceOf(storage, Storage);
+            assert.instanceOf(storage, Storage);
+        });
     });
 
     describe('#length', function () {
@@ -80,11 +91,24 @@ describe('JsonPersistentStorage', function () {
             }
         });
 
-        // Try to write a file but the name is already aken by a directory.
+        it('should not write a file if the path is already taken by a directory', function (done) {
+            rimraf(myPath, function (err) {
+                mkdirp(path.join(myPath, 'foo.json'), function (err) {
+                    storage.setItem('foo', 'bar', function (err) {
+                        assert.notStrictEqual(err, null);
+                        assert.strictEqual(err.code, 'EISDIR');
+                        done();
+                    });
+                });
+            });
+        }, 1000);
+
         // Try to write a file into a subdir but the dir does not exist.
 
         it('should increase length when setting a new item', function (done) {
+            assert.strictEqual(storage.length, 0);
             storage.setItem('foo', 'bar', function (err) {
+                cl(err);
                 assert.strictEqual(err, null);
                 assert.strictEqual(storage.length, 1);
                 done();
