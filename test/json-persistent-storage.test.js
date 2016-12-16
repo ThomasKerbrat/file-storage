@@ -61,11 +61,54 @@ describe('JsonPersistentStorage', function () {
     });
 
     describe('#key()', function () {
+        let storage;
+
+        beforeEach(function () {
+            storage = new Storage(myPath);
+        });
 
     });
 
     describe('#getItem()', function () {
+        let storage;
 
+        beforeEach(function (done) {
+            storage = new Storage(myPath);
+            storage.setItem('foo', 'bar', function (err) {
+                assert.strictEqual(err, null);
+                assert.strictEqual(storage.length, 1);
+                done();
+            });
+        });
+
+        it('should throw if the callback parameter is provided but not a function', function () {
+            assert.throws(function () {
+                storage.getItem('foo', 'not a callback');
+            }, Error, /cb must be a function/);
+        });
+
+        it('should not accept to get a key containing a separator', function (done) {
+            storage.getItem(path.join('baz', 'foo'), function (err) {
+                assert.notStrictEqual(err, null);
+                assert.include(err.message, 'key must not contain a separator. Found at index');
+                done();
+            });
+        });
+
+        it('should do nothing if the key does not exist in the cache', function (done) {
+            storage.getItem('nonExistentKey', function (err) {
+                assert.strictEqual(err, null);
+                done();
+            });
+        });
+
+        it('should read the file at "myPath/key.json" for the given key', function (done) {
+            storage.getItem('foo', function (err, value) {
+                assert.strictEqual(err, null);
+                assert.strictEqual(value, 'bar');
+                done();
+            });
+        });
     });
 
     describe('#setItem()', function () {

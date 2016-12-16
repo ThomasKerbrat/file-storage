@@ -37,7 +37,31 @@
 
         function key(index) { }
 
-        function getItem(key) { }
+        function getItem(key, cb) {
+            if (typeof cb === 'undefined') { cb = noop; }
+            else if (typeof cb !== 'function') { throw new Error('cb must be a function'); }
+
+            var sepIndex = key.indexOf(path.sep)
+            if (sepIndex !== -1) {
+                return cb(new Error('key must not contain a separator. Found at index ' + sepIndex));
+            }
+
+            var keyIndex = keys.indexOf(key);
+            if (keyIndex === -1) {
+                return cb(null);
+            }
+
+            var filePath = path.format({ dir: _path, name: key, ext: '.json' });
+            fs.readFile(filePath, { encoding: 'utf8' }, function (err, data) {
+                if (err) { return cb(err); }
+                try {
+                    data = JSON.parse(data);
+                } catch (err) {
+                    return cb(err);
+                }
+                cb(null, data);
+            });
+        }
 
         function setItem(key, value, cb) { // cl('setItem', key);
             if (typeof cb === 'undefined') { cb = noop; }
@@ -78,7 +102,7 @@
 
             function resume() {
                 var filePath = path.format({ dir: _path, name: key, ext: '.json' });
-                fs.writeFile(filePath, value, function (err) {
+                fs.writeFile(filePath, value, { encoding: 'utf8' }, function (err) {
                     if (err) {
                         err.n = 2;
                         return cb(err);
