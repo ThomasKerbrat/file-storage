@@ -144,10 +144,16 @@ describe('JsonPersistentStorage', function () {
             storage = new Storage(myPath);
         });
 
-        it('should decrease when removing an item', function () {
-            storage.setItem('foo', 'bar');
-            storage.removeItem('foo');
-            assert.strictEqual(storage.length, 0);
+        it('should decrease when removing an item', function (done) {
+            storage.setItem('foo', 'bar', function (err) {
+                assert.strictEqual(err, null);
+                assert.strictEqual(storage.length, 1);
+                storage.removeItem('foo', function (err) {
+                    assert.strictEqual(err, null);
+                    assert.strictEqual(storage.length, 0);
+                    done();
+                });
+            });
         });
     });
 
@@ -158,12 +164,16 @@ describe('JsonPersistentStorage', function () {
             storage = new Storage(myPath);
         });
 
-        it('should reset to 0 when clearing', function () {
-            storage.setItem('foo', 'bar');
-            assert.strictEqual(storage.length, 1);
-
-            storage.clear();
-            assert.strictEqual(storage.length, 0);
+        it('should reset to 0 when clearing', function (done) {
+            storage.setItem('foo', 'bar', function (err) {
+                assert.strictEqual(err, null);
+                assert.strictEqual(storage.length, 1);
+                storage.clear(function (err) {
+                    assert.strictEqual(err, null);
+                    assert.strictEqual(storage.length, 0);
+                    done();
+                });
+            });
         });
     });
 });
