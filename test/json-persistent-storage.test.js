@@ -90,7 +90,7 @@ describe('JsonPersistentStorage', function () {
         });
 
         it('should not accept to write a key containing a separator', function (done) {
-            storage.setItem('baz/foo', 'bar', function (err) {
+            storage.setItem(path.join('baz', 'foo'), 'bar', function (err) {
                 assert.notStrictEqual(err, null);
                 assert.include(err.message, 'key must not contain a separator. Found at index');
                 done();
@@ -120,12 +120,13 @@ describe('JsonPersistentStorage', function () {
             });
         });
 
-        it('should not increase length for items already present', function () {
+        it('should not increase length for items already present', function (done) {
             storage.setItem('foo', 'bar', function (err) {
                 assert.strictEqual(err, null);
                 storage.setItem('foo', 'bar', function (err) {
                     assert.strictEqual(err, null);
                     assert.strictEqual(storage.length, 1);
+                    done();
                 });
             });
         });
@@ -144,7 +145,7 @@ describe('JsonPersistentStorage', function () {
             storage = new Storage(myPath);
         });
 
-        it('should decrease when removing an item', function (done) {
+        it('should decrease length when removing an item', function (done) {
             storage.setItem('foo', 'bar', function (err) {
                 assert.strictEqual(err, null);
                 assert.strictEqual(storage.length, 1);
@@ -153,6 +154,41 @@ describe('JsonPersistentStorage', function () {
                     assert.strictEqual(storage.length, 0);
                     done();
                 });
+            });
+        });
+
+        it('should throw if the callback parameter is provided but not a function', function () {
+            assert.throws(function () {
+                storage.removeItem('foo', 'not a callback');
+            }, Error, /cb must be a function/);
+        });
+
+        it('should not accept to remove a key containing a separator', function (done) {
+            storage.removeItem(path.join('baz', 'foo'), function (err) {
+                assert.notStrictEqual(err, null);
+                assert.include(err.message, 'key must not contain a separator. Found at index');
+                done();
+            });
+        });
+
+        it('should do nothing if the key does not exist in the cache', function (done) {
+            storage.removeItem('nonExistentKey', function (err) {
+                assert.strictEqual(err, null);
+                done();
+            });
+        });
+
+        it('should delete (unlink) a file for the given key', function (done) {
+            storage.setItem('foo', 'bar', function (err) {
+                assert.strictEqual(err, null);
+                storage.removeItem('foo', function (err) {
+                    assert.strictEqual(err, null);
+                    fs.access(path.format({ dir: myPath, name: 'foo', ext: '.json' }), function (err) {
+                        assert.notStrictEqual(err, null);
+                        assert.strictEqual(err.code, 'ENOENT');
+                        done();
+                    });
+                })
             });
         });
     });
