@@ -118,6 +118,20 @@ describe('JsonPersistentStorage', function () {
             storage = new Storage(myPath);
         });
 
+        it('should throw if the callback parameter is provided but not a function', function () {
+            assert.throws(function () {
+                storage.setItem('foo', 'bar', 'not a callback');
+            }, Error, /cb must be a function/);
+        });
+
+        it('should not accept to write a key containing a separator', function (done) {
+            storage.setItem(path.join('baz', 'foo'), 'bar', function (err) {
+                assert.notStrictEqual(err, null);
+                assert.include(err.message, 'key must not contain a separator. Found at index');
+                done();
+            });
+        });
+
         it('should write a file for the given key at "myPath/key.json"', function (done) {
             const fileName = 'foo';
             const filePath = path.format({ dir: myPath, name: fileName, ext: '.json' });
@@ -128,14 +142,6 @@ describe('JsonPersistentStorage', function () {
                     assert.strictEqual(err, null);
                     done();
                 });
-            });
-        });
-
-        it('should not accept to write a key containing a separator', function (done) {
-            storage.setItem(path.join('baz', 'foo'), 'bar', function (err) {
-                assert.notStrictEqual(err, null);
-                assert.include(err.message, 'key must not contain a separator. Found at index');
-                done();
             });
         });
 
@@ -172,12 +178,6 @@ describe('JsonPersistentStorage', function () {
                 });
             });
         });
-
-        it('should throw if the callback parameter is provided but not a function', function () {
-            assert.throws(function () {
-                storage.setItem('foo', 'bar', 'not a callback');
-            }, Error, /cb must be a function/);
-        });
     });
 
     describe('#removeItem()', function () {
@@ -185,18 +185,6 @@ describe('JsonPersistentStorage', function () {
 
         beforeEach(function () {
             storage = new Storage(myPath);
-        });
-
-        it('should decrease length when removing an item', function (done) {
-            storage.setItem('foo', 'bar', function (err) {
-                assert.strictEqual(err, null);
-                assert.strictEqual(storage.length, 1);
-                storage.removeItem('foo', function (err) {
-                    assert.strictEqual(err, null);
-                    assert.strictEqual(storage.length, 0);
-                    done();
-                });
-            });
         });
 
         it('should throw if the callback parameter is provided but not a function', function () {
@@ -217,6 +205,18 @@ describe('JsonPersistentStorage', function () {
             storage.removeItem('nonExistentKey', function (err) {
                 assert.strictEqual(err, null);
                 done();
+            });
+        });
+
+        it('should decrease length when removing an item', function (done) {
+            storage.setItem('foo', 'bar', function (err) {
+                assert.strictEqual(err, null);
+                assert.strictEqual(storage.length, 1);
+                storage.removeItem('foo', function (err) {
+                    assert.strictEqual(err, null);
+                    assert.strictEqual(storage.length, 0);
+                    done();
+                });
             });
         });
 
