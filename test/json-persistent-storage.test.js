@@ -2,11 +2,31 @@ const assert = require('chai').assert;
 const JsonPersistentStorage = require('../src/json-persistent-storage.js').JsonPersistentStorage;
 
 describe('JsonPersistentStorage', () => {
+    let storage;
+    const myPath = 'myPath';
+
+    it('should throw an error when no params are given', () => {
+        assert.throws(() => {
+            storage = new JsonPersistentStorage();
+        }, TypeError, /Missing path argument/);
+    });
+
+    it('should not throw an error when a param is given', () => {
+        assert.doesNotThrow(() => {
+            storage = new JsonPersistentStorage(myPath);
+        }, TypeError, /Missing path argument/);
+    });
+
+    it('should instantiate a new JsonPersistentStorage object', () => {
+        storage = new JsonPersistentStorage(myPath);
+        assert.instanceOf(storage, JsonPersistentStorage);
+    });
+
     describe('#length', () => {
         let storage;
 
         beforeEach(() => {
-            storage = new JsonPersistentStorage();
+            storage = new JsonPersistentStorage(myPath);
         });
 
         it('should be a number', () => {
@@ -35,7 +55,7 @@ describe('JsonPersistentStorage', () => {
         let storage;
 
         beforeEach(() => {
-            storage = new JsonPersistentStorage();
+            storage = new JsonPersistentStorage(myPath);
         });
 
         it('should increase when setting a new item', () => {
@@ -54,7 +74,7 @@ describe('JsonPersistentStorage', () => {
         let storage;
 
         beforeEach(() => {
-            storage = new JsonPersistentStorage();
+            storage = new JsonPersistentStorage(myPath);
         });
 
         it('should decrease when removing an item', () => {
@@ -68,7 +88,7 @@ describe('JsonPersistentStorage', () => {
         let storage;
 
         beforeEach(() => {
-            storage = new JsonPersistentStorage();
+            storage = new JsonPersistentStorage(myPath);
         });
 
         it('should reset to 0 when clearing', () => {

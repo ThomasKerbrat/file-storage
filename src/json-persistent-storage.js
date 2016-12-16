@@ -1,8 +1,12 @@
 (function (exports) {
 
-    function JsonPersistentStorage() {
+    function JsonPersistentStorage(path) {
         if (!(this instanceof JsonPersistentStorage)) {
             return new JsonPersistentStorage();
+        }
+
+        if (typeof path !== 'string') {
+            throw TypeError('Missing path argument');
         }
 
         var length = 0;
