@@ -41,6 +41,11 @@
             if (typeof cb === 'undefined') { cb = noop; }
             else if (typeof cb !== 'function') { throw new Error('cb must be a function'); }
 
+            var sepIndex = key.indexOf(path.sep)
+            if (sepIndex !== -1) {
+                return cb(new Error('key must not contain a separator. Found at index ' + sepIndex));
+            }
+
             var value;
             try {
                 value = JSON.stringify(value);

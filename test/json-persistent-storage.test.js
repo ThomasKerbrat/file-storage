@@ -80,20 +80,28 @@ describe('JsonPersistentStorage', function () {
             const fileName = 'foo';
             const filePath = path.format({ dir: myPath, name: fileName, ext: '.json' });
 
-            storage.setItem(fileName, 'bar', onSetItemDone);
-
-            function onSetItemDone(err) {
+            storage.setItem(fileName, 'bar', function (err) {
                 assert.strictEqual(err, null);
                 fs.access(filePath, function (err) {
                     assert.strictEqual(err, null);
                     done();
                 });
-            }
+            });
+        });
+
+        it('should not accept to write a key containing a separator', function (done) {
+            storage.setItem('baz/foo', 'bar', function (err) {
+                assert.notStrictEqual(err, null);
+                assert.include(err.message, 'key must not contain a separator. Found at index');
+                done();
+            });
         });
 
         it('should not write a file if the path is already taken by a directory', function (done) {
             rimraf(myPath, function (err) {
+                assert.strictEqual(err, null);
                 mkdirp(path.join(myPath, 'foo.json'), function (err) {
+                    assert.strictEqual(err, null);
                     storage.setItem('foo', 'bar', function (err) {
                         assert.notStrictEqual(err, null);
                         assert.strictEqual(err.code, 'EISDIR');
@@ -101,14 +109,11 @@ describe('JsonPersistentStorage', function () {
                     });
                 });
             });
-        }, 1000);
-
-        // Try to write a file into a subdir but the dir does not exist.
+        });
 
         it('should increase length when setting a new item', function (done) {
             assert.strictEqual(storage.length, 0);
             storage.setItem('foo', 'bar', function (err) {
-                cl(err);
                 assert.strictEqual(err, null);
                 assert.strictEqual(storage.length, 1);
                 done();
