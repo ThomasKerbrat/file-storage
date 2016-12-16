@@ -38,8 +38,7 @@
         function key(index) { }
 
         function getItem(key, cb) {
-            if (typeof cb === 'undefined') { cb = noop; }
-            else if (typeof cb !== 'function') { throw new Error('cb must be a function'); }
+            cb = checkCallBack(cb);
 
             var sepIndex = key.indexOf(path.sep)
             if (sepIndex !== -1) {
@@ -64,8 +63,7 @@
         }
 
         function setItem(key, value, cb) { // cl('setItem', key);
-            if (typeof cb === 'undefined') { cb = noop; }
-            else if (typeof cb !== 'function') { throw new Error('cb must be a function'); }
+            cb = checkCallBack(cb);
 
             var sepIndex = key.indexOf(path.sep)
             if (sepIndex !== -1) {
@@ -118,8 +116,7 @@
         }
 
         function removeItem(key, cb) { // cl('removeItem', key);
-            if (typeof cb === 'undefined') { cb = noop; }
-            else if (typeof cb !== 'function') { throw new Error('cb must be a function'); }
+            cb = checkCallBack(cb);
 
             var sepIndex = key.indexOf(path.sep)
             if (sepIndex !== -1) {
@@ -144,8 +141,7 @@
         }
 
         function clear(cb) {
-            if (typeof cb === 'undefined') { cb = noop; }
-            else if (typeof cb !== 'function') { throw new Error('cb must be a function'); }
+            cb = checkCallBack(cb);
 
             if (keys.length === 0) { return cb(null); }
 
@@ -166,6 +162,17 @@
                 if (removeItemResultsCount === initialKeyCount) { return cb(null); }
             }
         }
+    }
+
+    /**
+     * @summary Checks if the callback is provided, if it is, it must be a function, otherwise default to noop.
+     * @param {any} callback The callback to test.
+     * @return {function} Return the callback to use. It can be the given one or the noop.
+     */
+    function checkCallBack(callback) {
+        if (typeof callback === 'undefined') { return noop; }
+        else if (typeof callback !== 'function') { throw new Error('cb must be a function'); }
+        else { return callback; }
     }
 
     // NodeJS
