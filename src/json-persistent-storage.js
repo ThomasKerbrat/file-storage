@@ -1,7 +1,7 @@
 (function (exports) {
 
-    var path = require('path');
     var fs = require('fs');
+    var path = require('path');
     // TODO: Remove mkdirp dependency and force the storage directory to be created before.
     var mkdirp = require('mkdirp');
 
@@ -18,6 +18,7 @@
             throw TypeError('Missing path argument');
         }
 
+        var self = this;
         var length = 0;
         var keys = [];
 
@@ -38,7 +39,7 @@
 
         function getItem(key) { }
 
-        function setItem(key, value, cb) {
+        function setItem(key, value, cb) { // cl('setItem', key);
             if (typeof cb === 'undefined') { cb = noop; }
             else if (typeof cb !== 'function') { throw new Error('cb must be a function'); }
 
@@ -92,7 +93,7 @@
             }
         }
 
-        function removeItem(key, cb) {
+        function removeItem(key, cb) { // cl('removeItem', key);
             if (typeof cb === 'undefined') { cb = noop; }
             else if (typeof cb !== 'function') { throw new Error('cb must be a function'); }
 
@@ -118,7 +119,29 @@
             });
         }
 
-        function clear() { }
+        function clear(cb) {
+            if (typeof cb === 'undefined') { cb = noop; }
+            else if (typeof cb !== 'function') { throw new Error('cb must be a function'); }
+
+            if (keys.length === 0) { return cb(null); }
+
+            var initialKeyCount = keys.length;
+            var removeItemResultsCount = 0;
+            var hasErrorOccurred = false;
+
+            keys.forEach(function (key) {
+                self.removeItem(key, function (err) {
+                    joinCallbacks(err);
+                });
+            });
+
+            function joinCallbacks(err) {
+                if (hasErrorOccurred) { return; }
+                if (err) { hasErrorOccurred = true; return cb(err); }
+                removeItemResultsCount++;
+                if (removeItemResultsCount === initialKeyCount) { return cb(null); }
+            }
+        }
     }
 
     // NodeJS

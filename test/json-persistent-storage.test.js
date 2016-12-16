@@ -10,7 +10,6 @@ const cl = console.log;
 function log(value) { console.log('**LOG**', value); return value; };
 
 describe('JsonPersistentStorage', function () {
-    let storage;
     const myPath = 'test/data/myPath';
 
     beforeEach(function () {
@@ -196,18 +195,46 @@ describe('JsonPersistentStorage', function () {
     describe('#clear()', function () {
         let storage;
 
-        beforeEach(function () {
+        beforeEach(function (done) {
             storage = new Storage(myPath);
-        });
-
-        it('should reset to 0 when clearing', function (done) {
             storage.setItem('foo', 'bar', function (err) {
                 assert.strictEqual(err, null);
                 assert.strictEqual(storage.length, 1);
+                done();
+            });
+        });
+
+        it('should throw if the callback parameter is provided but not a function', function () {
+            assert.throws(function () {
+                storage.clear('foo', 'not a callback');
+            }, Error, /cb must be a function/);
+        });
+
+        it('should reset to 0 when clearing', function (done) {
+            storage.clear(function (err) {
+                assert.strictEqual(err, null);
+                assert.strictEqual(storage.length, 0);
+                done();
+            });
+        });
+
+        it('should remove all keys present in the cache', function (done) {
+            // Callback 🔥H🔥E🔥L🔥L🔥
+            storage.setItem('bar', 'baz', function (err) {
+                assert.strictEqual(err, null);
+                assert.strictEqual(storage.length, 2);
                 storage.clear(function (err) {
                     assert.strictEqual(err, null);
                     assert.strictEqual(storage.length, 0);
-                    done();
+                    fs.access(path.format({ dir: myPath, name: 'foo', ext: '.json' }), function (err) {
+                        assert.notStrictEqual(err, null);
+                        assert.strictEqual(err.code, 'ENOENT');
+                        fs.access(path.format({ dir: myPath, name: 'bar', ext: '.json' }), function (err) {
+                            assert.notStrictEqual(err, null);
+                            assert.strictEqual(err.code, 'ENOENT');
+                            done();
+                        });
+                    });
                 });
             });
         });
