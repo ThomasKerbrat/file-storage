@@ -2,6 +2,7 @@
 
     var path = require('path');
     var fs = require('fs');
+    // TODO: Remove mkdirp dependency and force the storage directory to be created before.
     var mkdirp = require('mkdirp');
 
     var noop = function () { };
