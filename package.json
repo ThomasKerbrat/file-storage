@@ -2,9 +2,9 @@
   "name": "json-persistent-storage",
   "version": "0.0.1",
   "description": "A JSON persistence solution for NodeJS.",
-  "main": "json-persistent-storage.js",
+  "main": "src/json-persistent-storage.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/.bin/mocha --require mocha-clean ./test"
   },
   "repository": {
     "type": "git",
@@ -30,5 +30,10 @@
   "bugs": {
     "url": "https://github.com/ThomasKerbrat/json-persistent-storage/issues"
   },
-  "homepage": "https://github.com/ThomasKerbrat/json-persistent-storage#readme"
+  "homepage": "https://github.com/ThomasKerbrat/json-persistent-storage#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "mocha-clean": "^1.0.0"
+  }
 }
