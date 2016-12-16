@@ -1,34 +1,34 @@
 {
-	"name": "json-persistent-storage",
-	"version": "0.0.0",
-	"description": "A JSON persistence solution for NodeJS.",
-	"main": "json-persistent-storage.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/ThomasKerbrat/json-persistent-storage.git"
-	},
-	"keywords": [
-		"json",
-		"persistent",
-		"persistance",
-		"storage",
-		"webstorage",
-		"webapi",
-		"get",
-		"set",
-		"file",
-		"system",
-		"fs",
-		"node",
-		"nodejs"
-	],
-	"author": "Thomas Kerbrat <kerbrat@outlook.com>",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/ThomasKerbrat/json-persistent-storage/issues"
-	},
-	"homepage": "https://github.com/ThomasKerbrat/json-persistent-storage#readme"
+  "name": "json-persistent-storage",
+  "version": "0.0.1",
+  "description": "A JSON persistence solution for NodeJS.",
+  "main": "json-persistent-storage.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThomasKerbrat/json-persistent-storage.git"
+  },
+  "keywords": [
+    "json",
+    "persistent",
+    "persistance",
+    "storage",
+    "webstorage",
+    "webapi",
+    "get",
+    "set",
+    "file",
+    "system",
+    "fs",
+    "node",
+    "nodejs"
+  ],
+  "author": "Thomas Kerbrat <kerbrat@outlook.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ThomasKerbrat/json-persistent-storage/issues"
+  },
+  "homepage": "https://github.com/ThomasKerbrat/json-persistent-storage#readme"
 }
