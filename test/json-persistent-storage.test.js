@@ -129,6 +129,12 @@ describe('JsonPersistentStorage', function () {
                 });
             });
         });
+
+        it('should throw if the callback parameter is provided but not a function', function () {
+            assert.throws(function () {
+                storage.setItem('foo', 'bar', 'not a callback');
+            }, Error, /cb must be a function/);
+        });
     });
 
     describe('#removeItem()', function () {
