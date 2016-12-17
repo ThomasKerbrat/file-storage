@@ -5,6 +5,9 @@
     // TODO: Remove mkdirp dependency and force the storage directory to be created before.
     var mkdirp = require('mkdirp');
 
+    var EXTENSION = '.json';
+    // TODO: Configurabe extension.
+    function getFilePath(directory, fileName) { return buidFilePath(directory, fileName, EXTENSION); }
     var noop = function () { };
 
     var cl = console.log;
@@ -44,7 +47,7 @@
             if (!keyValidationResult.isValid) { return cb(new Error(keyValidationResult.message)); }
             if (!keyValidationResult.isPresent) { return cb(null); }
 
-            var filePath = path.format({ dir: _path, name: key, ext: '.json' });
+            var filePath = getFilePath(_path, key);
             fs.readFile(filePath, { encoding: 'utf8' }, function (err, data) {
                 if (err) { return cb(err); }
                 try {
@@ -91,7 +94,7 @@
             });
 
             function resume() {
-                var filePath = path.format({ dir: _path, name: key, ext: '.json' });
+                var filePath = getFilePath(_path, key);
                 fs.writeFile(filePath, value, { encoding: 'utf8' }, function (err) {
                     if (err) {
                         err.n = 2;
@@ -114,7 +117,7 @@
             if (!keyValidationResult.isValid) { return cb(new Error(keyValidationResult.message)); }
             if (!keyValidationResult.isPresent) { return cb(null); }
 
-            var filePath = path.format({ dir: _path, name: key, ext: '.json' });
+            var filePath = getFilePath(_path, key);
             fs.unlink(filePath, function (err) {
                 if (err) {
                     cb(err);
@@ -199,8 +202,12 @@
      * @summary Format the relative file path of a given file name.
      * @param {string} directory The directory 
      */
-    function getFilePath(directory, fileName, extension) {
-
+    function buidFilePath(directory, fileName, extension) {
+        return path.format({
+            dir: directory,
+            name: fileName,
+            ext: extension,
+        });
     }
 
     // NodeJS
