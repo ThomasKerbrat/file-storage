@@ -7,7 +7,7 @@ var checkCallBack = require('./utils.js').checkCallBack;
 var validateKey = require('./utils.js').validateKey;
 var buidFilePath = require('./utils.js').buidFilePath;
 
-var EXTENSION = '.json';
+var EXTENSION = '';
 // TODO: Configurabe extension.
 function getFilePath(directory, fileName) { return buidFilePath(directory, fileName, EXTENSION); }
 
