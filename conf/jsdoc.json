@@ -3,6 +3,9 @@
         "destination": "./docs/",
         "recurse": true
     },
+    "plugins": [
+        "plugins/markdown"
+    ],
     "source": {
         "include": [
             "src/",
