@@ -40,15 +40,9 @@
         function getItem(key, cb) {
             cb = checkCallBack(cb);
 
-            var sepIndex = key.indexOf(path.sep)
-            if (sepIndex !== -1) {
-                return cb(new Error('key must not contain a separator. Found at index ' + sepIndex));
-            }
-
-            var keyIndex = keys.indexOf(key);
-            if (keyIndex === -1) {
-                return cb(null);
-            }
+            var keyValidationResult = validateKey(key, keys);
+            if (!keyValidationResult.isValid) { return cb(new Error(keyValidationResult.message)); }
+            if (!keyValidationResult.isPresent) { return cb(null); }
 
             var filePath = path.format({ dir: _path, name: key, ext: '.json' });
             fs.readFile(filePath, { encoding: 'utf8' }, function (err, data) {
@@ -62,13 +56,11 @@
             });
         }
 
-        function setItem(key, value, cb) { // cl('setItem', key);
+        function setItem(key, value, cb) {
             cb = checkCallBack(cb);
 
-            var sepIndex = key.indexOf(path.sep)
-            if (sepIndex !== -1) {
-                return cb(new Error('key must not contain a separator. Found at index ' + sepIndex));
-            }
+            var keyValidationResult = validateKey(key, keys);
+            if (!keyValidationResult.isValid) { return cb(new Error(keyValidationResult.message)); }
 
             var value;
             try {
@@ -115,25 +107,19 @@
             }
         }
 
-        function removeItem(key, cb) { // cl('removeItem', key);
+        function removeItem(key, cb) {
             cb = checkCallBack(cb);
 
-            var sepIndex = key.indexOf(path.sep)
-            if (sepIndex !== -1) {
-                return cb(new Error('key must not contain a separator. Found at index ' + sepIndex));
-            }
-
-            var keyIndex = keys.indexOf(key);
-            if (keyIndex === -1) {
-                return cb(null);
-            }
+            var keyValidationResult = validateKey(key, keys);
+            if (!keyValidationResult.isValid) { return cb(new Error(keyValidationResult.message)); }
+            if (!keyValidationResult.isPresent) { return cb(null); }
 
             var filePath = path.format({ dir: _path, name: key, ext: '.json' });
             fs.unlink(filePath, function (err) {
                 if (err) {
                     cb(err);
                 } else {
-                    keys.splice(keyIndex, 1);
+                    keys.splice(keyValidationResult.atIndex, 1);
                     length--;
                     cb(null);
                 }
@@ -165,14 +151,56 @@
     }
 
     /**
-     * @summary Checks if the callback is provided, if it is, it must be a function, otherwise default to noop.
-     * @param {any} callback The callback to test.
+     * @summary Checks if the callback is provided. If provided, it must be a function, otherwise default to noop.
+     * @param {any} callback The callback to check.
      * @return {function} Return the callback to use. It can be the given one or the noop.
      */
     function checkCallBack(callback) {
         if (typeof callback === 'undefined') { return noop; }
         else if (typeof callback !== 'function') { throw new Error('cb must be a function'); }
         else { return callback; }
+    }
+
+    /**
+     * @summary Checks if the key is valid. It includes checking if the key has a separator as defined by `path.sep`.
+     * @param {string} key The key to check.
+     * @param {string[]} keys All the keys in the cache.
+     * @returns {ValidationResult} Does the key contain a separator?
+     */
+    function validateKey(key, keys) {
+
+        /**
+         * @typedef ValidationResult
+         * @property {boolean} isValid Is the key valid?
+         * @property {boolean} isPresent Is the key present in the cache?
+         * @property {number} atIndex If the key is present, the index in the given keys array.
+         * @property {string} message The error message in case the key is not valid.
+         */
+        var result = {};
+
+        // TODO: Is a string?
+
+        var separatorIndex = key.indexOf(path.sep);
+        if (separatorIndex !== -1) {
+            result.isValid = false;
+            result.message = 'key must not contain a separator. Found at index ' + separatorIndex;
+            return result;
+        } else {
+            result.isValid = true;
+        }
+
+        result.atIndex = keys.indexOf(key);
+        result.isPresent = result.atIndex > -1;
+
+        return result;
+    }
+
+    /**
+     * @summary Format the relative file path of a given file name.
+     * @param {string} directory The directory 
+     */
+    function getFilePath(directory, fileName, extension) {
+
     }
 
     // NodeJS
