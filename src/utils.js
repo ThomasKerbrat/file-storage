@@ -7,7 +7,7 @@ var path = require('path');
  * @summary Checks if the callback is provided.
  * @description If the callback is provided, it must be a function, otherwise default to noop.
  * @param {function} [callback] The callback to check.
- * @return {function} Return the callback to use. It can be the given one or the noop.
+ * @returns {function} Return the callback to use. It can be the given one or the noop.
  */
 module.exports.checkCallBack = function checkCallBack(callback) {
     if (typeof callback === 'undefined') { return function () { }; }
@@ -70,6 +70,7 @@ module.exports.validateKey = function validateKey(key, keys) {
  * @param {string} directory The directory (dir) path.
  * @param {string} fileName The file (name) path.
  * @param {string} extension The extention, including the dot (ext).
+ * @returns {string} The formatted path for the given parameters.
  */
 module.exports.buidFilePath = function buidFilePath(directory, fileName, extension) {
     return path.format({

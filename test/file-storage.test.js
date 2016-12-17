@@ -7,7 +7,7 @@ const mkdirp = require('mkdirp');
 
 const Storage = require('../src/file-storage.js').FileStorage;
 
-describe('JsonPersistentStorage', function () {
+describe('FileStorage', function () {
     const myPath = 'test/data/myPath';
 
     beforeEach(function () {
@@ -31,7 +31,7 @@ describe('JsonPersistentStorage', function () {
             }, TypeError, /Missing path argument/);
         });
 
-        it('should instantiate a new JsonPersistentStorage object', function () {
+        it('should instantiate a new FileStorage object', function () {
             storage = new Storage(myPath);
             assert.instanceOf(storage, Storage);
         });
@@ -143,7 +143,7 @@ describe('JsonPersistentStorage', function () {
             });
         });
 
-        it('should read the file at "myPath/key.json" for the given key', function (done) {
+        it('should read the file at "myPath/key" for the given key', function (done) {
             storage.getItem('foo', function (err, value) {
                 assert.strictEqual(err, null);
                 assert.strictEqual(value, 'bar');
@@ -181,9 +181,9 @@ describe('JsonPersistentStorage', function () {
             });
         });
 
-        it('should write a file for the given key at "myPath/key.json"', function (done) {
+        it('should write a file for the given key at "myPath/key"', function (done) {
             const fileName = 'foo';
-            const filePath = path.format({ dir: myPath, name: fileName, ext: '.json' });
+            const filePath = path.format({ dir: myPath, name: fileName });
 
             storage.setItem(fileName, 'bar', function (err) {
                 assert.strictEqual(err, null);
@@ -195,7 +195,7 @@ describe('JsonPersistentStorage', function () {
         });
 
         it('should not write a file if the path is already taken by a directory', function (done) {
-            mkdirp(path.join(myPath, 'foo.json'), function (err) {
+            mkdirp(path.join(myPath, 'foo'), function (err) {
                 assert.strictEqual(err, null);
                 storage.setItem('foo', 'bar', function (err) {
                     assert.notStrictEqual(err, null);
@@ -306,7 +306,7 @@ describe('JsonPersistentStorage', function () {
                 assert.strictEqual(err, null);
                 storage.removeItem('foo', function (err) {
                     assert.strictEqual(err, null);
-                    fs.access(path.format({ dir: myPath, name: 'foo', ext: '.json' }), function (err) {
+                    fs.access(path.format({ dir: myPath, name: 'foo' }), function (err) {
                         assert.notStrictEqual(err, null);
                         assert.strictEqual(err.code, 'ENOENT');
                         done();
@@ -350,10 +350,10 @@ describe('JsonPersistentStorage', function () {
                 storage.clear(function (err) {
                     assert.strictEqual(err, null);
                     assert.strictEqual(storage.length, 0);
-                    fs.access(path.format({ dir: myPath, name: 'foo', ext: '.json' }), function (err) {
+                    fs.access(path.format({ dir: myPath, name: 'foo' }), function (err) {
                         assert.notStrictEqual(err, null);
                         assert.strictEqual(err.code, 'ENOENT');
-                        fs.access(path.format({ dir: myPath, name: 'bar', ext: '.json' }), function (err) {
+                        fs.access(path.format({ dir: myPath, name: 'bar' }), function (err) {
                             assert.notStrictEqual(err, null);
                             assert.strictEqual(err.code, 'ENOENT');
                             done();
