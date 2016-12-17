@@ -1,13 +1,11 @@
 const assert = require('chai').assert;
-const Storage = require('../src/json-persistent-storage.js').JsonPersistentStorage;
-
 const fs = require('fs');
 const path = require('path');
+
 const rimraf = require('rimraf');
 const mkdirp = require('mkdirp');
 
-const cl = console.log;
-function log(value) { console.log('**LOG**', value); return value; };
+const Storage = require('../src/file-storage.js').FileStorage;
 
 describe('JsonPersistentStorage', function () {
     const myPath = 'test/data/myPath';
@@ -37,6 +35,8 @@ describe('JsonPersistentStorage', function () {
             storage = new Storage(myPath);
             assert.instanceOf(storage, Storage);
         });
+
+        it('should restore the cache (length and keys) from the given path');
     });
 
     describe('#length', function () {
@@ -195,15 +195,12 @@ describe('JsonPersistentStorage', function () {
         });
 
         it('should not write a file if the path is already taken by a directory', function (done) {
-            rimraf(myPath, function (err) {
+            mkdirp(path.join(myPath, 'foo.json'), function (err) {
                 assert.strictEqual(err, null);
-                mkdirp(path.join(myPath, 'foo.json'), function (err) {
-                    assert.strictEqual(err, null);
-                    storage.setItem('foo', 'bar', function (err) {
-                        assert.notStrictEqual(err, null);
-                        assert.strictEqual(err.code, 'EISDIR');
-                        done();
-                    });
+                storage.setItem('foo', 'bar', function (err) {
+                    assert.notStrictEqual(err, null);
+                    assert.strictEqual(err.code, 'EISDIR');
+                    done();
                 });
             });
         });
@@ -227,6 +224,33 @@ describe('JsonPersistentStorage', function () {
                 });
             });
         });
+
+        [
+            ['undefined', undefined, 'undefined'],
+            ['null', null, 'null'],
+            ['number', 123, '123'],
+            ['string', 'abc', 'abc'],
+            ['function', logArgs, 'function logArgs() { console.log(arguments); }'],
+            ['object', { a: 0 }, '[object Object]'],
+            ['array', ['abc', 123, 'null', null], 'abc,123,null,']
+        ].forEach((args) => itMustAcceptAnyValueToStore.apply(null, args));
+
+        function itMustAcceptAnyValueToStore(valueType, value, expected) {
+            return it(`should must accept ${ valueType } value to store`, function (done) {
+                assert.strictEqual(storage.length, 0);
+                storage.setItem('foo-' + valueType, value, function (err) {
+                    assert.strictEqual(err, null);
+                    assert.strictEqual(storage.length, 1);
+                    storage.getItem('foo-' + valueType, function (err, value) {
+                        assert.strictEqual(err, null);
+                        assert.strictEqual(value, expected);
+                        done();
+                    });
+                });
+            });
+        }
+
+        function logArgs() { console.log(arguments); }
     });
 
     describe('#removeItem()', function () {

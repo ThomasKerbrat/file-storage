@@ -11,9 +11,9 @@ var EXTENSION = '.json';
 // TODO: Configurabe extension.
 function getFilePath(directory, fileName) { return buidFilePath(directory, fileName, EXTENSION); }
 
-function JsonPersistentStorage(_path) {
-    if (!(this instanceof JsonPersistentStorage)) {
-        return new JsonPersistentStorage(_path);
+function FileStorage(_path) {
+    if (!(this instanceof FileStorage)) {
+        return new FileStorage(_path);
     }
 
     if (typeof _path !== 'string') {
@@ -56,11 +56,6 @@ function JsonPersistentStorage(_path) {
         var filePath = getFilePath(_path, key);
         fs.readFile(filePath, { encoding: 'utf8' }, function (err, data) {
             if (err) { return cb(err); }
-            try {
-                data = JSON.parse(data);
-            } catch (err) {
-                return cb(err);
-            }
             cb(null, data);
         });
     }
@@ -71,13 +66,9 @@ function JsonPersistentStorage(_path) {
         var keyValidationResult = validateKey(key, keys);
         if (!keyValidationResult.isValid) { return cb(new Error(keyValidationResult.message)); }
 
-        var value;
-        try {
-            value = JSON.stringify(value);
-        } catch (err) {
-            err.n = 0;
-            return cb(err);
-        }
+        if (value === undefined) { value = 'undefined'; }
+        if (value === null) { value = 'null'; }
+        value = value.toString();
 
         fs.access(_path, function (err) {
             if (err !== null) {
@@ -159,4 +150,4 @@ function JsonPersistentStorage(_path) {
     }
 }
 
-module.exports.JsonPersistentStorage = JsonPersistentStorage;
+module.exports.FileStorage = FileStorage;
