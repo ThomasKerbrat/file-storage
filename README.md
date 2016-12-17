@@ -11,7 +11,7 @@ TODO
 
 ## API
 
-The online documentation is available at [thomaskerbrat.github.io/json-persistent-storage](https://thomaskerbrat.github.io/json-persistent-storage/).
+The online documentation is available at [thomaskerbrat.github.io/file-storage](https://thomaskerbrat.github.io/file-storage/).
 
 # License
 
