@@ -87,6 +87,14 @@ describe('JsonPersistentStorage', function () {
             }, Error, /cb must be a function/);
         });
 
+        it('should not accept to get a non string key', function (done) {
+            storage.getItem(123, function (err) {
+                assert.notStrictEqual(err, null);
+                assert.include(err.message, 'key must be a string');
+                done();
+            });
+        });
+
         it('should not accept to get a key containing a separator', function (done) {
             storage.getItem(path.join('baz', 'foo'), function (err) {
                 assert.notStrictEqual(err, null);
@@ -122,6 +130,14 @@ describe('JsonPersistentStorage', function () {
             assert.throws(function () {
                 storage.setItem('foo', 'bar', 'not a callback');
             }, Error, /cb must be a function/);
+        });
+
+        it('should not accept to get a non string key', function (done) {
+            storage.getItem(123, function (err) {
+                assert.notStrictEqual(err, null);
+                assert.include(err.message, 'key must be a string');
+                done();
+            });
         });
 
         it('should not accept to write a key containing a separator', function (done) {
@@ -191,6 +207,14 @@ describe('JsonPersistentStorage', function () {
             assert.throws(function () {
                 storage.removeItem('foo', 'not a callback');
             }, Error, /cb must be a function/);
+        });
+
+        it('should not accept to get a non string key', function (done) {
+            storage.getItem(123, function (err) {
+                assert.notStrictEqual(err, null);
+                assert.include(err.message, 'key must be a string');
+                done();
+            });
         });
 
         it('should not accept to remove a key containing a separator', function (done) {

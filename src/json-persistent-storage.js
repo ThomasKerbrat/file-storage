@@ -181,15 +181,17 @@
          */
         var result = {};
 
-        // TODO: Is a string?
+        result.isValid = typeof key === 'string';
+        if (!result.isValid) {
+            result.message = 'key must be a string';
+            return result;
+        }
 
         var separatorIndex = key.indexOf(path.sep);
-        if (separatorIndex !== -1) {
-            result.isValid = false;
+        result.isValid = separatorIndex === -1;
+        if (!result.isValid) {
             result.message = 'key must not contain a separator. Found at index ' + separatorIndex;
             return result;
-        } else {
-            result.isValid = true;
         }
 
         result.atIndex = keys.indexOf(key);
