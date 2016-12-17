@@ -11,7 +11,7 @@ It implements the [Storage](https://html.spec.whatwg.org/multipage/webstorage.ht
 FileStorage is intended to be used in NodeJS environment.
 It abstracts the `fs` module API to a simpler one like the local and session storage.
 
-The FileStorage API is comprised of `getItem()`, `setItem()`, `removeItem()`, `key()`, `clear()` and `index`.
+The FileStorage API is comprised of `getItem()`, `setItem()`, `removeItem()`, `key()`, `clear()` and `length`.
 
 ``` javascript
 const FileStorage = require('file-storage').FileStorage;
