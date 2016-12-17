@@ -38,3 +38,6 @@ jspm_packages
 
 # Tests
 test/data/
+
+# Default JSDoc output directory. Use doc/ instead.
+out/
