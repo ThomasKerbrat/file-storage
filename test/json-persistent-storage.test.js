@@ -63,10 +63,43 @@ describe('JsonPersistentStorage', function () {
     describe('#key()', function () {
         let storage;
 
-        beforeEach(function () {
+        beforeEach(function (done) {
             storage = new Storage(myPath);
+            storage.setItem('foo', 'bar', function (err) {
+                assert.strictEqual(err, null);
+                assert.strictEqual(storage.length, 1);
+                done();
+            });
         });
 
+        it('should throw if first parameter is not a number', function () {
+            assert.throws(function () {
+                storage.key(null);
+            }, TypeError, /index must be a number/);
+        })
+
+        it('should return a string for an inbound index', function () {
+            const result = storage.key(0);
+            assert.strictEqual(typeof result, 'string');
+        });
+
+        it('should return null for an index out of range', function () {
+            const result = storage.key(1);
+            assert.strictEqual(result, null);
+            const result2 = storage.key(-1);
+            assert.strictEqual(result2, null);
+        });
+
+        it('should return a key for the given index', function () {
+            const result = storage.key(0);
+            assert.strictEqual(result, 'foo');
+        });
+
+        it('should preserve order between two key() calls', function () {
+            const firstKeyIndex = storage.key(0);
+            const secondKeyIndex = storage.key(0);
+            assert.strictEqual(firstKeyIndex, secondKeyIndex);
+        });
     });
 
     describe('#getItem()', function () {

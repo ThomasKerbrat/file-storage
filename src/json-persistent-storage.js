@@ -38,7 +38,14 @@
             return length;
         }
 
-        function key(index) { }
+        function key(index) {
+            if (typeof index !== 'number') {
+                throw new TypeError('index must be a number. ' + index + 'given.');
+            }
+
+            var isIndexOutOfBounds = index < 0 || index >= keys.length;
+            return isIndexOutOfBounds ? null : keys[index];
+        }
 
         function getItem(key, cb) {
             cb = checkCallBack(cb);
