@@ -1,6 +1,6 @@
 {
   "name": "file-storage",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A JSON persistence solution for NodeJS.",
   "main": "src/file-storage.js",
   "scripts": {
