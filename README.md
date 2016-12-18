@@ -54,6 +54,19 @@ This fits into the NodeJS API style.
 The first argument of the callback function is the potential error.
 For the `getItem()` method, the callback function takes the data as a second argument.
 
+## Why FileStorage?
+
+I wanted a software component that can read/write files in the file system.
+Using the NodeJS `fs` module in the application code would have created a strong dependency to that particular technology.
+
+In order to invert that dependency, the persistance layer must implement an interface from the application layer.
+This is exactly what this library is all about.
+
+Because the `FileStorage` implements the `Storage` interface,
+the application code can rely on that implementation without tightly coupling itself.
+
+See [Dependency inversion principle](https://en.wikipedia.org/wiki/Dependency_inversion_principle).
+
 ## API
 
 The online documentation is available at
