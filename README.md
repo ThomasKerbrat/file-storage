@@ -61,11 +61,13 @@ The online documentation is available at
 
 ## Roadmap
 
-In no particular order :
+In no particular order:
 
 - Configure encoding.
 - Configure extension for the saved files. (They currently have no extension, only the key itself.)
 - Normalize the key before reading, writing or deleting the file.
+- Configure optional hooks for (de-)serializing data before read/write.
+- Initialize the internal keys array at instantiation.
 
 # License
 
