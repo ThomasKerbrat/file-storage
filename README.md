@@ -35,8 +35,8 @@ The default encoding is UTF-8.
 The files have no extension by default.
 
 The library does not serialize the passed data in any format.
-This is to let you choose which method to serialize you data.
-As the data is stored as text, it is converted to text using the `toString()` method.
+This is to let you choose which method to use to serialize your data.
+As the data is stored as text, it is coerced to a string.
 Thus, passing an object will store `[object Object]`.
 
 ``` javascript

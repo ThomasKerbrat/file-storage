@@ -36,7 +36,7 @@ module.exports.checkCallBack = function checkCallBack(callback) {
  * 
  * @param {string} key The key to check.
  * @param {string[]} [keys] All the keys in the cache. (optional)
- * @returns {KeyValidationResult} A KeyValidationResult object with the result of the validation.
+ * @returns {module:utils~KeyValidationResult} A KeyValidationResult object with the result of the validation.
  */
 module.exports.validateKey = function validateKey(key, keys) {
 

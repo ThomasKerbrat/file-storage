@@ -77,7 +77,7 @@ FileStorage.prototype.getItem = function getItem(key, cb) {
 /**
  * @summary Write the item's value for the given key.
  * @param {string} key The key under which to write the value.
- * @param {undefined|null|string} value The value to write. Will be converted to a string with `.toString()`.
+ * @param {string} value The value to write. Will be coerced to a string.
  * @param {module:file-storage~Callback} cb The function to be called when the operation succeed or fail.
  * @returns {void}
  */
@@ -87,10 +87,7 @@ FileStorage.prototype.setItem = function setItem(key, value, cb) {
     var keyValidationResult = validateKey(key, this.keys);
     if (!keyValidationResult.isValid) { return cb(new Error(keyValidationResult.message)); }
 
-    if (value === undefined) { value = 'undefined'; }
-    if (value === null) { value = 'null'; }
-    value = value.toString();
-
+    value = value + '';
     var self = this;
 
     fs.access(this.directory, function (err) {
@@ -121,7 +118,7 @@ FileStorage.prototype.setItem = function setItem(key, value, cb) {
 }
 
 /**
- * @summary Deletes the file on the file syste for the given key.
+ * @summary Deletes the file on the file system for the given key.
  * @param {string} key The key under which to delete the value.
  * @param {module:file-storage~Callback} cb The function to be called when the operation succeed or fail.
  * @returns {void}
@@ -151,6 +148,7 @@ FileStorage.prototype.removeItem = function removeItem(key, cb) {
  * @description
  * In order to know which key to delete, the clear method does a for each loop on the keys array used internally.
  * Thus, not all files present in the storage directory will be deleted.
+ * @param {module:file-storage~Callback} cb The function to be called when the operation succeed or fail.
  * @returns {void}
  */
 FileStorage.prototype.clear = function clear(cb) {
