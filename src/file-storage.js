@@ -68,7 +68,7 @@ FileStorage.prototype.getItem = function getItem(key, cb) {
 
     var keyValidationResult = validateKey(key, this.keys);
     if (!keyValidationResult.isValid) { return cb(new Error(keyValidationResult.message)); }
-    if (!keyValidationResult.isPresent) { return cb(null); }
+    if (!keyValidationResult.isPresent) { return cb(null, null); }
 
     var filePath = buidFilePath(this.directory, key);
     fs.readFile(filePath, { encoding: 'utf8' }, cb);

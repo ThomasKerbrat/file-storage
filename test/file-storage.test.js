@@ -136,9 +136,10 @@ describe('FileStorage', function () {
             });
         });
 
-        it('should do nothing if the key does not exist in the cache', function (done) {
-            storage.getItem('nonExistentKey', function (err) {
+        it('should return null if the key does not exist in the cache', function (done) {
+            storage.getItem('nonExistentKey', function (err, value) {
                 assert.strictEqual(err, null);
+                assert.strictEqual(value, null);
                 done();
             });
         });
@@ -236,7 +237,7 @@ describe('FileStorage', function () {
         ].forEach((args) => itMustAcceptAnyValueToStore.apply(null, args));
 
         function itMustAcceptAnyValueToStore(valueType, value, expected) {
-            return it(`should must accept ${ valueType } value to store`, function (done) {
+            return it(`should must accept ${valueType} value to store`, function (done) {
                 assert.strictEqual(storage.length, 0);
                 storage.setItem('foo-' + valueType, value, function (err) {
                     assert.strictEqual(err, null);
