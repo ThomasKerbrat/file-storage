@@ -13,7 +13,8 @@ var defaults = require('./utils.js').defaults;
 /**
  * @typedef OptionsObject
  * @property {boolean} restore Restore the keys index from the existing files in the storage directory.
- * @property {null|function} serialize Function that will be called before writing data to file system.
+ * @property {null|function} serialize Function that will be called before writing data to the file system.
+ * @property {null|function} deserialize Function that will be called after reading data from the file system.
  */
 
 /**
@@ -78,8 +79,12 @@ FileStorage.prototype.key = function key(index) {
 /**
  * @summary Read the item for the given key.
  * @description
+ * 
  * First checks if the key exists.
  * If so, reads the content of the file named after the given key.
+ * 
+ * Will call de-serialization hook configured at instantiation.
+ * 
  * @param {string} key The key to read.
  * @param {module:file-storage~Callback} cb The function to be called when the operation succeed or fail.
  * @returns {void}
