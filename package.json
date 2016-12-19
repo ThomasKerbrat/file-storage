@@ -1,6 +1,6 @@
 {
   "name": "file-storage",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A NodeJS implementation of the WebStorage API.",
   "main": "src/file-storage.js",
   "scripts": {
