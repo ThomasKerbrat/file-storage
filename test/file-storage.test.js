@@ -22,13 +22,13 @@ describe('FileStorage', function () {
         it('should throw an error when no params are given', function () {
             assert.throws(function () {
                 storage = new Storage();
-            }, TypeError, /Missing path argument/);
+            }, Error, /Missing path argument/);
         });
 
         it('should not throw an error when a param is given', function () {
             assert.doesNotThrow(function () {
                 storage = new Storage(myPath);
-            }, TypeError, /Missing path argument/);
+            }, Error, /Missing path argument/);
         });
 
         it('should instantiate a new FileStorage object', function () {
