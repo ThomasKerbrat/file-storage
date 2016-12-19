@@ -36,7 +36,22 @@ describe('FileStorage', function () {
             assert.instanceOf(storage, Storage);
         });
 
-        it('should restore the cache (length and keys) from the given path');
+        it('should restore the cache (length and keys) from the given path', function (done) {
+            mkdirp(myPath, function (err) {
+                assert.strictEqual(err, null);
+                const filePath = path.format({ dir: myPath, name: 'foo' });
+                fs.writeFile(filePath, 'bar', function (err) {
+                    assert.strictEqual(err, null);
+                    storage = new Storage(myPath, { restore: true });
+                    assert.strictEqual(storage.length, 1);
+                    storage.getItem('foo', function (err, value) {
+                        assert.strictEqual(err, null);
+                        assert.strictEqual(value, 'bar');
+                        done();
+                    });
+                });
+            });
+        });
     });
 
     describe('#length', function () {

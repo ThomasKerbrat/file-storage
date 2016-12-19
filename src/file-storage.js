@@ -6,6 +6,7 @@ var mkdirp = require('mkdirp');
 var checkCallBack = require('./utils.js').checkCallBack;
 var validateKey = require('./utils.js').validateKey;
 var buidFilePath = require('./utils.js').buidFilePath;
+var defaults = require('./utils.js').defaults;
 
 /** @module */
 
@@ -20,7 +21,7 @@ var buidFilePath = require('./utils.js').buidFilePath;
  * @constructor
  * @param {string} directory The directory in which the files will be written.
  */
-function FileStorage(directory) {
+function FileStorage(directory, options) {
     if (!(this instanceof FileStorage)) {
         return new FileStorage(directory);
     }
@@ -35,6 +36,16 @@ function FileStorage(directory) {
     Object.defineProperty(this, 'length', {
         get: function () { return this.keys.length; }
     });
+
+    var self = this;
+    options = defaults(options);
+
+    if (options.restore === true) {
+        var files = fs.readdirSync(this.directory);
+        files.forEach(function (file) {
+            self.keys.push(path.parse(file).name);
+        });
+    }
 }
 
 /**

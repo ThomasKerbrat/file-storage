@@ -2,6 +2,7 @@
 /** @module */
 
 var path = require('path');
+var defaultOptions = require('./default-options.json');
 
 /**
  * @summary Checks if the callback is provided.
@@ -80,3 +81,22 @@ module.exports.buidFilePath = function buidFilePath(directory, fileName, extensi
     });
 }
 
+/**
+ * @private
+ * @summary Deep clone a value with JSON parse and stringify.
+ * @param {any} obj The value to clone.
+ * @return {any} The cloned value.
+ */
+function clone(obj) {
+    if (typeof obj === 'undefined') { return; }
+    return JSON.parse(JSON.stringify(obj));
+}
+
+/**
+ * @summary Checks the option object and provide defaults value if necessary.
+ * @param {Options} rawOptions The user's options object to verify.
+ * @returns {Options} The validated options object with missing or invalid properties to their default values.
+ */
+module.exports.defaults = function defaults(rawOptions) {
+    return Object.assign({}, clone(defaultOptions), clone(rawOptions));
+}
