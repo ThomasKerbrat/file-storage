@@ -79,7 +79,6 @@ In no particular order:
 - Configure encoding.
 - Configure extension for the saved files. (They currently have no extension, only the key itself.)
 - Normalize the key before reading, writing or deleting the file.
-- Configure optional hooks for (de-)serializing data before read/write.
 
 # License
 

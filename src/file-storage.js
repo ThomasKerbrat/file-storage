@@ -158,7 +158,6 @@ FileStorage.prototype.setItem = function setItem(key, value, cb) {
         var filePath = buidFilePath(self.directory, key);
         fs.writeFile(filePath, serializedValue, { encoding: 'utf8' }, function (err) {
             if (err) {
-                err.n = 2;
                 return cb(err);
             } else {
                 if (self.keys.indexOf(key) === -1) {
