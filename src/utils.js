@@ -40,7 +40,6 @@ module.exports.checkCallBack = function checkCallBack(callback) {
  * @returns {module:utils~KeyValidationResult} A KeyValidationResult object with the result of the validation.
  */
 module.exports.validateKey = function validateKey(key, keys) {
-
     /** @type {KeyValidationResult} */
     var result = {};
 
@@ -94,9 +93,20 @@ function clone(obj) {
 
 /**
  * @summary Checks the option object and provide defaults value if necessary.
- * @param {Options} rawOptions The user's options object to verify.
- * @returns {Options} The validated options object with missing or invalid properties to their default values.
+ * @param {module:file-storage~OptionsObject} rawOptions The user's options object to verify.
+ * @throws {TypeError} If any provided value's type is not correct.
+ * @returns {module:file-storage~OptionsObject} The validated options object with missing or invalid properties to their default values.
  */
 module.exports.defaults = function defaults(rawOptions) {
-    return Object.assign({}, clone(defaultOptions), clone(rawOptions));
+    var options = Object.assign({}, defaultOptions, rawOptions);
+
+    if (options.serialize !== null && typeof options.serialize !== 'function') {
+        throw new TypeError('options.serialize must be a function');
+    }
+
+    if (options.deserialize !== null && typeof options.deserialize !== 'function') {
+        throw new TypeError('options.deserialize must be a function');
+    }
+
+    return options;
 }

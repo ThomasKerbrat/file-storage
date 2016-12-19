@@ -54,6 +54,79 @@ describe('FileStorage', function () {
         });
     });
 
+    describe('[serialize hook]', function () {
+        it('should be called before writing to file system', function (done) {
+            storage = new Storage(myPath, {
+                serialize: (data) => {
+                    return JSON.stringify({ pi: 3.14 });
+                }
+            });
+
+            storage.setItem('foo', 'bar', function (err) {
+                assert.strictEqual(err, null);
+                storage.getItem('foo', function (err, value) {
+                    assert.strictEqual(err, null);
+                    assert.strictEqual(value, '{"pi":3.14}');
+                    done();
+                });
+            });
+        });
+
+        it('should break setItem if an error is thrown', function (done) {
+            storage = new Storage(myPath, {
+                serialize: (data) => {
+                    throw 42;
+                }
+            });
+
+            storage.setItem('foo', 'bar', function (err) {
+                assert.instanceOf(err, Error);
+                assert.include(err.message, 'An error occured in the serialize hook function');
+                storage.getItem('foo', function (err, data) {
+                    assert.strictEqual(err, null);
+                    assert.strictEqual(data, null);
+                    done();
+                });
+            });
+        });
+    });
+
+    describe('[de-serialize hook]', function () {
+        it('should be called after reading from the file system', function (done) {
+            storage = new Storage(myPath, {
+                deserialize: (string) => {
+                    return JSON.parse(string);
+                }
+            });
+
+            storage.setItem('foo', '{"pi":3.14}', function (err) {
+                assert.strictEqual(err, null);
+                storage.getItem('foo', function (err, value) {
+                    assert.strictEqual(err, null);
+                    assert.deepEqual(value, { pi: 3.14 });
+                    done();
+                });
+            });
+        });
+
+        it('should break getItem if an error is thrown', function (done) {
+            storage = new Storage(myPath, {
+                deserialize: (data) => {
+                    throw 42;
+                }
+            });
+
+            storage.setItem('foo', '{"pi":3.14}', function (err) {
+                assert.strictEqual(err, null);
+                storage.getItem('foo', function (err, data) {
+                    assert.instanceOf(err, Error);
+                    assert.include(err.message, 'An error occured in the de-serialize hook function');
+                    done();
+                });
+            });
+        });
+    });
+
     describe('#length', function () {
         let storage;
 

@@ -11,15 +11,23 @@ var defaults = require('./utils.js').defaults;
 /** @module */
 
 /**
+ * @typedef OptionsObject
+ * @property {boolean} restore Restore the keys index from the existing files in the storage directory.
+ * @property {null|function} serialize Function that will be called before writing data to file system.
+ */
+
+/**
  * @typedef {function} Callback
  * @param {Object|null} err The error object if something wrong appened, null otherwhise.
  * @param {string} [data] The value read from the file. For {@link getItem} only.
  */
 
 /**
- * @summary Instantiate a new FileStorage object.
  * @constructor
+ * @summary Instantiate a new FileStorage object.
  * @param {string} directory The directory in which the files will be written.
+ * @param {module:file-storage~OptionsObject} [options] The options object.
+ * @throws {Error} Throws a new Error if the directory parameter is not given.
  */
 function FileStorage(directory, options) {
     if (!(this instanceof FileStorage)) {
@@ -27,7 +35,7 @@ function FileStorage(directory, options) {
     }
 
     if (typeof directory !== 'string') {
-        throw TypeError('Missing path argument');
+        throw new Error('Missing path argument');
     }
 
     this.directory = directory;
@@ -38,9 +46,9 @@ function FileStorage(directory, options) {
     });
 
     var self = this;
-    options = defaults(options);
+    Object.assign(this, options = defaults(options));
 
-    if (options.restore === true) {
+    if (this.restore === true) {
         var files = fs.readdirSync(this.directory);
         files.forEach(function (file) {
             self.keys.push(path.parse(file).name);
@@ -51,8 +59,10 @@ function FileStorage(directory, options) {
 /**
  * @summary Get the key at index.
  * @description
+ * 
  * The indexes of the keys are arbitraty.
  * They won't change until you set or remove a key.
+ * 
  * @param {number} index The index at which looking for a key name.
  * @returns {string} The key at index position.
  */
@@ -81,8 +91,25 @@ FileStorage.prototype.getItem = function getItem(key, cb) {
     if (!keyValidationResult.isValid) { return cb(new Error(keyValidationResult.message)); }
     if (!keyValidationResult.isPresent) { return cb(null, null); }
 
+    var self = this;
+
     var filePath = buidFilePath(this.directory, key);
-    fs.readFile(filePath, { encoding: 'utf8' }, cb);
+    fs.readFile(filePath, { encoding: 'utf8' }, function (err, data) {
+        if (err !== null) { return cb(err, null); }
+
+        var parsedData = data;
+
+        if (self.deserialize !== null) {
+            console.log(self.deserialize);
+            try {
+                parsedData = self.deserialize.call({}, data);
+            } catch (err) {
+                return cb(new Error(['An error occured in the de-serialize hook function.', err].join('\n')));
+            }
+        }
+
+        cb(null, parsedData);
+    });
 }
 
 /**
@@ -98,8 +125,18 @@ FileStorage.prototype.setItem = function setItem(key, value, cb) {
     var keyValidationResult = validateKey(key, this.keys);
     if (!keyValidationResult.isValid) { return cb(new Error(keyValidationResult.message)); }
 
-    value = value + '';
     var self = this;
+
+    var stringValue = value + '';
+    var serializedValue = stringValue;
+
+    if (this.serialize !== null) {
+        try {
+            serializedValue = this.serialize.call({}, stringValue);
+        } catch (err) {
+            return cb(new Error(['An error occured in the serialize hook function.', err].join('\n')));
+        }
+    }
 
     fs.access(this.directory, function (err) {
         if (err !== null) {
@@ -114,7 +151,7 @@ FileStorage.prototype.setItem = function setItem(key, value, cb) {
 
     function resume() {
         var filePath = buidFilePath(self.directory, key);
-        fs.writeFile(filePath, value, { encoding: 'utf8' }, function (err) {
+        fs.writeFile(filePath, serializedValue, { encoding: 'utf8' }, function (err) {
             if (err) {
                 err.n = 2;
                 return cb(err);
