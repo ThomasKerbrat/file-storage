@@ -113,7 +113,7 @@ FileStorage.prototype.getItem = function getItem(key, cb) {
             }
         }
 
-        cb(null, parsedData);
+        return cb(null, parsedData);
     });
 }
 
@@ -142,27 +142,20 @@ FileStorage.prototype.setItem = function setItem(key, rawValue, cb) {
     }
 
     fs.access(this.directory, function (err) {
-        if (err !== null) {
-            if (err.code === 'ENOENT') {
-                mkdirp(self.directory, function (err) {
-                    if (err) { cb(err); }
-                    else { resume(); }
-                });
-            } else { cb(err); }
-        } else { resume(); }
+        if (err === null) { return resume(); }
+        if (err.code !== 'ENOENT') { return cb(err); }
+        mkdirp(self.directory, function (err) {
+            if (err) { cb(err); }
+            else { resume(); }
+        });
     });
 
     function resume() {
         var filePath = buidFilePath(self.directory, key);
-        fs.writeFile(filePath, serializedValue, { encoding: 'utf8' }, function (err) {
-            if (err) {
-                return cb(err);
-            } else {
-                if (self.keys.indexOf(key) === -1) {
-                    self.keys.push(key);
-                }
-                cb(null);
-            }
+        fs.writeFile(filePath, value, { encoding: 'utf8' }, function (err) {
+            if (err) { return cb(err); }
+            if (self.keys.indexOf(key) === -1) { self.keys.push(key); }
+            return cb(null);
         });
     }
 }
@@ -184,12 +177,9 @@ FileStorage.prototype.removeItem = function removeItem(key, cb) {
     var self = this;
 
     fs.unlink(filePath, function (err) {
-        if (err) {
-            cb(err);
-        } else {
-            self.keys.splice(keyValidationResult.atIndex, 1);
-            cb(null);
-        }
+        if (err) { return cb(err); }
+        self.keys.splice(keyValidationResult.atIndex, 1);
+        return cb(null);
     });
 }
 
