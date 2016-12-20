@@ -120,24 +120,22 @@ FileStorage.prototype.getItem = function getItem(key, cb) {
 /**
  * @summary Write the item's value for the given key.
  * @param {string} key The key under which to write the value.
- * @param {string} value The value to write. Will be coerced to a string.
+ * @param {string} rawValue The value to write. Will be coerced to a string.
  * @param {module:file-storage~Callback} cb The function to be called when the operation succeed or fail.
  * @returns {void}
  */
-FileStorage.prototype.setItem = function setItem(key, value, cb) {
+FileStorage.prototype.setItem = function setItem(key, rawValue, cb) {
     cb = checkCallBack(cb);
 
     var keyValidationResult = validateKey(key, this.keys);
     if (!keyValidationResult.isValid) { return cb(new Error(keyValidationResult.message)); }
 
     var self = this;
-
-    var stringValue = value + '';
-    var serializedValue = stringValue;
+    var value = rawValue;
 
     if (this.serialize !== null) {
         try {
-            serializedValue = this.serialize.call({}, stringValue);
+            value = this.serialize.call({}, rawValue) + '';
         } catch (err) {
             return cb(new Error(['An error occured in the serialize hook function.', err].join('\n')));
         }

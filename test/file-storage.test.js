@@ -89,6 +89,23 @@ describe('FileStorage', function () {
                 });
             });
         });
+
+        it('should return data serialized', function (done) {
+            storage = new Storage(myPath, {
+                serialize: (data) => {
+                    return JSON.stringify(data);
+                }
+            });
+
+            storage.setItem('foo', { pi: 3.14 }, function (err) {
+                assert.strictEqual(err, null);
+                storage.getItem('foo', function (err, data) {
+                    assert.strictEqual(err, null);
+                    assert.strictEqual(data, '{"pi":3.14}');
+                    done();
+                });
+            });
+        });
     });
 
     describe('[de-serialize hook]', function () {
@@ -121,6 +138,23 @@ describe('FileStorage', function () {
                 storage.getItem('foo', function (err, data) {
                     assert.instanceOf(err, Error);
                     assert.include(err.message, 'An error occured in the de-serialize hook function');
+                    done();
+                });
+            });
+        });
+
+        it('should return parsed data', function (done) {
+            storage = new Storage(myPath, {
+                deserialize: (data) => {
+                    return JSON.parse(data);
+                }
+            });
+
+            storage.setItem('foo', '{"pi":3.14}', function (err) {
+                assert.strictEqual(err, null);
+                storage.getItem('foo', function (err, data) {
+                    assert.strictEqual(err, null);
+                    assert.deepEqual(data, { pi: 3.14 });
                     done();
                 });
             });
